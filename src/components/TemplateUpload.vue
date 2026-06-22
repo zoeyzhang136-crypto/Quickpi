@@ -7,7 +7,7 @@
       <input
         ref="fileInput"
         type="file"
-        accept=".xlsx"
+        accept=".xlsx,.xls,.csv"
         @change="handleFileSelect"
         style="display: none"
       />
@@ -56,7 +56,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, rowIdx) in templateData.preview_data.slice(1, 4)" :key="rowIdx">
+            <tr v-for="(row, rowIdx) in templateData.preview_data.slice(1)" :key="rowIdx">
               <td v-for="(cell, cellIdx) in row" :key="cellIdx">
                 {{ cell || '' }}
               </td>
