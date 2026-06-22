@@ -4,21 +4,21 @@
       <h2>登录 QuickPI</h2>
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
-          <label>手机号</label>
-          <input 
-            v-model="phone" 
-            type="tel" 
-            placeholder="请输入手机号"
-            required
-          />
+          <label>Email</label>
+         <input 
+  v-model="phone" 
+  type="email" 
+  placeholder="type your email..."
+  required
+/>
         </div>
 
         <div class="form-group">
-          <label>密码</label>
+          <label>Password</label>
           <input 
             v-model="password" 
             type="password" 
-            placeholder="请输入密码"
+            placeholder="type your password..."
             required
           />
         </div>
