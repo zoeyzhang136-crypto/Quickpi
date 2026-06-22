@@ -96,11 +96,6 @@ export default {
     template: Object,
   },
   data() {
-  if (this.template) {
-    // 自动初始化预览数据
-    console.log('Template received:', this.template)
-  }
-}{
     return {
       markingMode: null,
       headerEndRow: null,
