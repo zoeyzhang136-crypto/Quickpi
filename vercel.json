@@ -8,9 +8,6 @@
       "runtime": "python3.11"
     }
   },
-  "env": {
-    "VITE_API_URL": "@vite_api_url"
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
