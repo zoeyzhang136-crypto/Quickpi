@@ -2,5 +2,12 @@
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/api/users/(.*)", "destination": "/api/users.js" },
+    { "source": "/api/templates/(.*)", "destination": "/api/templates.js" },
+    { "source": "/api/contracts/(.*)", "destination": "/api/contracts.js" },
+    { "source": "/api/invoices/(.*)", "destination": "/api/invoices.js" },
+    { "source": "/api/history/(.*)", "destination": "/api/history.js" }
+  ]
 }
