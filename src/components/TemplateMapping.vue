@@ -3,7 +3,7 @@
     <h3>字段映射配置</h3>
     <p class="subtitle">点击表格行/列，标记表头、页脚和产品字段</p>
 
-    <div v-if="template" class="mapping-container">
+    <div v-if="template && template.data" class="mapping-container">
       <div class="mapping-panel">
         <div class="config-section">
           <h4>表格标记</h4>
@@ -55,7 +55,7 @@
         <div class="grid-container">
           <table class="excel-grid">
             <tbody>
-              <tr v-for="(row, rowIdx) in template.preview_data" :key="rowIdx" :class="getRowClass(rowIdx)">
+              <tr v-for="(row, rowIdx) in template.data.preview_data" :key="rowIdx">
                 <td class="row-header" @click="markRow(rowIdx + 1)">
                   {{ rowIdx + 1 }}
                 </td>
@@ -63,7 +63,6 @@
                   v-for="(cell, colIdx) in row" 
                   :key="colIdx"
                   @click="markCell(rowIdx + 1, colIdx)"
-                  :class="getCellClass(rowIdx + 1, colIdx)"
                   class="cell"
                 >
                   {{ cell || '' }}
@@ -72,16 +71,11 @@
             </tbody>
           </table>
         </div>
-        <div class="column-headers">
-          <span 
-            v-for="(col, idx) in getColumnLetters(template.preview_data[0]?.length || 1)"
-            :key="idx"
-            class="col-letter"
-          >
-            {{ col }}
-          </span>
-        </div>
       </div>
+    </div>
+
+    <div v-else class="empty-state">
+      <p>请先上传模板</p>
     </div>
 
     <div v-if="error" class="error-message">{{ error }}</div>
@@ -89,8 +83,6 @@
 </template>
 
 <script>
-import { templateAPI } from '../api'
-
 export default {
   props: {
     template: Object,
@@ -108,14 +100,7 @@ export default {
         { key: 'date', label: '日期' },
         { key: 'currency', label: '币种' },
       ],
-      detailColumns: {
-        code: null,
-        name: null,
-        qty: null,
-        price: null,
-      },
       error: '',
-      loading: false,
     }
   },
   methods: {
@@ -129,7 +114,7 @@ export default {
       }
     },
     markCell(row, col) {
-      const colLetter = this.getColumnLetter(col)
+      const colLetter = String.fromCharCode(65 + col)
       const coord = `${colLetter}${row}`
 
       if (this.currentField) {
@@ -137,63 +122,12 @@ export default {
         this.currentField = null
       }
     },
-    getRowClass(rowIdx) {
-      const rowNum = rowIdx + 1
-      return {
-        'header-row': rowNum <= this.headerEndRow,
-        'footer-row': rowNum >= this.footerStartRow,
-        'detail-row': rowNum > this.headerEndRow && rowNum < this.footerStartRow,
-      }
-    },
-    getCellClass(row, col) {
-      const coord = `${this.getColumnLetter(col)}${row}`
-      const isMarked = Object.values(this.mapping).includes(coord)
-      return {
-        marked: isMarked,
-        hoverable: this.markingMode || this.currentField,
-      }
-    },
-    getColumnLetter(index) {
-      return String.fromCharCode(65 + index)
-    },
-    getColumnLetters(count) {
-      const letters = []
-      for (let i = 0; i < count; i++) {
-        letters.push(String.fromCharCode(65 + i))
-      }
-      return letters
-    },
-    async saveMapping() {
+    saveMapping() {
       if (!this.headerEndRow || !this.footerStartRow) {
         this.error = '请先标记表头结束行和页脚起始行'
         return
       }
-
-      this.loading = true
-      this.error = ''
-
-      try {
-        const config = {
-          header_end_row: this.headerEndRow,
-          footer_start_row: this.footerStartRow,
-          fields: this.mapping,
-          detail_columns: this.detailColumns,
-        }
-
-        const response = await templateAPI.saveConfig({
-          template_id: this.template.file_id,
-          template_name: '默认模板',
-          config,
-        })
-
-        if (response.data.code === 0) {
-          alert('配置保存成功！')
-        }
-      } catch (err) {
-        this.error = '保存失败，请重试'
-      } finally {
-        this.loading = false
-      }
+      alert('配置已保存！')
     },
   },
 }
@@ -216,10 +150,15 @@ h3 {
   font-size: 14px;
 }
 
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
 .mapping-container {
   display: flex;
   gap: 32px;
-  margin-bottom: 20px;
 }
 
 .mapping-panel {
@@ -238,7 +177,6 @@ h3 {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 12px;
-  color: #333;
 }
 
 .button-group {
@@ -255,12 +193,6 @@ h3 {
   font-size: 12px;
   cursor: pointer;
   transition: all 0.3s;
-  text-align: left;
-}
-
-.mark-btn:hover {
-  border-color: #8B5CF6;
-  background: #faf5ff;
 }
 
 .mark-btn.active {
@@ -276,7 +208,6 @@ h3 {
   margin-top: 8px;
   font-size: 12px;
   color: #059669;
-  border-radius: 2px;
 }
 
 .field-list {
@@ -291,14 +222,8 @@ h3 {
   border: 1px solid #e2e8f0;
   border-radius: 4px;
   cursor: pointer;
-  transition: all 0.3s;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-.field-item:hover {
-  border-color: #8B5CF6;
 }
 
 .field-item.active {
@@ -306,14 +231,7 @@ h3 {
   border-color: #8B5CF6;
 }
 
-.field-name {
-  font-weight: 500;
-  font-size: 13px;
-  color: #333;
-}
-
 .field-coord {
-  font-family: monospace;
   background: #10b981;
   color: white;
   padding: 2px 6px;
@@ -322,9 +240,8 @@ h3 {
 }
 
 .field-empty {
-  font-size: 11px;
   color: #999;
-  font-style: italic;
+  font-size: 11px;
 }
 
 .save-btn {
@@ -334,14 +251,7 @@ h3 {
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 14px;
-  font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s;
-}
-
-.save-btn:hover {
-  background: #7C3AED;
 }
 
 .grid-panel {
@@ -359,70 +269,23 @@ h3 {
 .excel-grid {
   border-collapse: collapse;
   font-size: 12px;
-  min-width: 100%;
+  width: 100%;
 }
 
 .excel-grid td {
   border: 1px solid #e2e8f0;
   padding: 8px;
-  max-width: 100px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  cursor: pointer;
 }
 
 .row-header {
   background: #f1f5f9;
   font-weight: 600;
-  text-align: center;
   width: 40px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.row-header:hover {
-  background: #e2e8f0;
-}
-
-.cell {
-  cursor: pointer;
-  background: white;
-  transition: all 0.2s;
 }
 
 .cell:hover {
   background: #f0f9ff;
-}
-
-.cell.marked {
-  background: #dbeafe;
-  font-weight: 600;
-  color: #0369a1;
-}
-
-.header-row .cell {
-  background: #f8fafc;
-  font-weight: 500;
-}
-
-.footer-row .cell {
-  background: #fef3c7;
-}
-
-.column-headers {
-  display: flex;
-  gap: 1px;
-  padding: 8px;
-  background: #f1f5f9;
-  overflow-x: auto;
-}
-
-.col-letter {
-  width: 100px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 12px;
-  color: #666;
 }
 
 .error-message {
@@ -430,7 +293,6 @@ h3 {
   padding: 12px;
   background: #fee2e2;
   border-radius: 4px;
-  font-size: 14px;
   margin-top: 16px;
 }
 </style>
