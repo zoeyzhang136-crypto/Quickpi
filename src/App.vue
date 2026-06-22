@@ -74,10 +74,8 @@ export default {
       },
     }
   },
-  methods: onTemplateSaved(config) {
-  console.log('Template config saved:', config)
-  this.currentTab = 'extract'
-}{
+  methods: 
+  {
     handleLogin(data) {
       this.isLoggedIn = true
       this.userName = data.phone
