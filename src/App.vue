@@ -31,7 +31,7 @@
 
         <div class="tab-content">
           <TemplateUpload v-if="currentTab === 'upload'" @uploaded="onTemplateUploaded" />
-          <TemplateMapping v-if="currentTab === 'mapping'" :template="selectedTemplate" />
+       <TemplateMapping v-if="currentTab === 'mapping'" :template="selectedTemplate" @save="onTemplateSaved" />
           <ContractExtract v-if="currentTab === 'extract'" />
           <InvoiceGenerate v-if="currentTab === 'generate'" />
           <History v-if="currentTab === 'history'" />
@@ -74,7 +74,10 @@ export default {
       },
     }
   },
-  methods: {
+  methods: onTemplateSaved(config) {
+  console.log('Template config saved:', config)
+  this.currentTab = 'extract'
+}{
     handleLogin(data) {
       this.isLoggedIn = true
       this.userName = data.phone
