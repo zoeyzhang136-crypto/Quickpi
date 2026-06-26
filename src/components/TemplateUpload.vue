@@ -50,13 +50,13 @@
         <table>
           <thead>
             <tr>
-              <td v-for="(cell, idx) in templateData.preview_data[0]" :key="idx">
+              <td v-for="(cell, idx) in templateData.data.preview_data[0]" :key="idx">
                 {{ cell || '' }}
               </td>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, rowIdx) in templateData.preview_data.slice(1)" :key="rowIdx">
+            <tr v-for="(row, rowIdx) in templateData.data.preview_data.slice(1)" :key="rowIdx">
               <td v-for="(cell, cellIdx) in row" :key="cellIdx">
                 {{ cell || '' }}
               </td>
@@ -64,7 +64,7 @@
           </tbody>
         </table>
       </div>
-      <p class="preview-hint">（预览前 3 行数据）</p>
+      <p class="preview-hint">（显示所有数据）</p>
 
       <button @click="confirmUpload" class="confirm-btn">确认模板并继续</button>
     </div>
@@ -73,7 +73,7 @@
   </div>
 </template>
 
-import { templateAPI } from '../api'
+<script>
 import XLSX from 'xlsx'
 
 export default {
@@ -106,37 +106,55 @@ export default {
       if (!this.selectedFile) return
 
       this.uploading = true
-      this.loading = true
       this.error = ''
 
       try {
-        // 前端直接用 SheetJS 读取 Excel
-        const arrayBuffer = await this.selectedFile.arrayBuffer()
-        const workbook = XLSX.read(arrayBuffer, { type: 'array' })
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+        const reader = new FileReader()
         
-        // 转换为二维数组（保留原始数据，包括合并单元格、格式等）
-        const previewData = XLSX.utils.sheet_to_json(worksheet, { 
-          header: 1,
-          defval: ''  // 空单元格用空字符串表示
-        })
+        reader.onload = (e) => {
+          try {
+            const data = e.target.result
+            const workbook = XLSX.read(data, { type: 'binary' })
+            const sheetName = workbook.SheetNames[0]
+            const worksheet = workbook.Sheets[sheetName]
+            
+            const previewData = XLSX.utils.sheet_to_json(worksheet, { 
+              header: 1,
+              defval: ''
+            })
 
-        // 存储模板数据
-        this.templateData = {
-          file_id: 'file_' + Date.now(),
-          file: this.selectedFile,  // 保存原始文件，后续生成时用
-          data: {
-            preview_data: previewData,
-            sheet_name: workbook.SheetNames[0],
-            max_row: previewData.length,
-            max_col: Math.max(...previewData.map(row => row.length))
+            console.log('预览数据行数:', previewData.length)
+            console.log('预览数据列数:', previewData[0]?.length)
+
+            this.templateData = {
+              file_id: 'file_' + Date.now(),
+              file: this.selectedFile,
+              data: {
+                preview_data: previewData,
+                sheet_name: sheetName,
+                max_row: previewData.length,
+                max_col: Math.max(...previewData.map(row => row?.length || 0))
+              }
+            }
+
+            this.uploading = false
+          } catch (err) {
+            this.error = '文件解析失败：' + err.message
+            this.uploading = false
+            console.error('解析错误:', err)
           }
         }
+
+        reader.onerror = () => {
+          this.error = '文件读取失败'
+          this.uploading = false
+        }
+
+        reader.readAsBinaryString(this.selectedFile)
       } catch (err) {
-        this.error = '文件解析失败：' + err.message
-      } finally {
+        this.error = '文件处理失败：' + err.message
         this.uploading = false
-        this.loading = false
+        console.error('处理错误:', err)
       }
     },
     confirmUpload() {
@@ -148,6 +166,7 @@ export default {
     },
   },
 }
+</script>
 
 <style scoped>
 .template-upload {
