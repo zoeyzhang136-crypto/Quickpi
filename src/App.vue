@@ -59,8 +59,8 @@ import LoginForm from './components/LoginForm.vue'
 import ContractExtract from './components/ContractExtract.vue'
 import InvoiceGenerate from './components/InvoiceGenerate.vue'
 import History from './components/History.vue'
-import TemplateUpload from './components/TemplateUpload.vue'
-import TemplateMapping from './components/TemplateMapping.vue'
+const TemplateUpload = { template: '<div style="padding:40px;text-align:center;color:#999;">模板上传功能调试中...</div>' }
+const TemplateMapping = { template: '<div style="padding:40px;text-align:center;color:#999;">字段映射功能调试中...</div>' }
 export default {
 components: {
   LoginForm,
