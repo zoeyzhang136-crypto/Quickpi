@@ -10,10 +10,9 @@ export default function handler(req, res) {
         max_row: 50,
         max_col: 10,
         merged_cells: ['A1:C1'],
-        preview_data: [
-          ['标题', null, null],
-          ['序号', '品名', '数量']
-        ]
+preview_data: Array.from({ length: 20 }, (_, i) => 
+  Array.from({ length: 10 }, (_, j) => `${i}-${j}`)
+)
       }
     });
   }
