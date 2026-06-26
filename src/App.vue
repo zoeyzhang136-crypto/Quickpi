@@ -56,20 +56,21 @@
 
 <script>
 import LoginForm from './components/LoginForm.vue'
+import TemplateUpload from './components/TemplateUpload.vue'
+import TemplateMapping from './components/TemplateMapping.vue'
 import ContractExtract from './components/ContractExtract.vue'
 import InvoiceGenerate from './components/InvoiceGenerate.vue'
 import History from './components/History.vue'
-const TemplateUpload = { template: '<div style="padding:40px;text-align:center;color:#999;">模板上传功能调试中...</div>' }
-const TemplateMapping = { template: '<div style="padding:40px;text-align:center;color:#999;">字段映射功能调试中...</div>' }
+
 export default {
-components: {
-  LoginForm,
-  TemplateUpload,
-  TemplateMapping,
-  ContractExtract,
-  InvoiceGenerate,
-  History,
-},
+  components: {
+    LoginForm,
+    TemplateUpload,
+    TemplateMapping,
+    ContractExtract,
+    InvoiceGenerate,
+    History,
+  },
   data() {
     return {
       isLoggedIn: false,
@@ -83,7 +84,6 @@ components: {
         generate: '生成单证',
         history: '历史记录',
       },
-      // 全局数据，贯穿整个流程
       templateData: null,
       mappingConfig: null,
       extractedData: null,
@@ -103,19 +103,16 @@ components: {
       this.extractedData = null
       localStorage.removeItem('user')
     },
-    // Step 1: 上传模板
     onTemplateUploaded(template) {
       console.log('Template uploaded:', template)
       this.templateData = template
       this.currentTab = 'mapping'
     },
-    // Step 2: 保存映射配置
     onMappingSaved(config) {
       console.log('Mapping saved:', config)
       this.mappingConfig = config
       this.currentTab = 'extract'
     },
-    // Step 3: 识别合同
     onContractExtracted(data) {
       console.log('Contract extracted:', data)
       this.extractedData = data
