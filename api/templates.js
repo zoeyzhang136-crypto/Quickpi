@@ -10,8 +10,12 @@ export default function handler(req, res) {
         max_row: 50,
         max_col: 10,
         merged_cells: ['A1:C1'],
-preview_data: Array.from({ length: 20 }, (_, i) => 
-  Array.from({ length: 10 }, (_, j) => `${i}-${j}`)
+preview_data: Array.from({ length: 25 }, (_, i) => 
+  Array.from({ length: 8 }, (_, j) => {
+    if (i === 0) return ['销售单据', 'Proforma Invoice', null, null, null, null, null, null][j]
+    if (i === 1) return ['序号', '品名', '数量', '单价', '金额', null, null, null][j]
+    return `数据${i}-${j}`
+  })
 )
       }
     });
