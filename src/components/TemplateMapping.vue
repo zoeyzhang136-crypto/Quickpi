@@ -126,7 +126,14 @@ export default {
       if (!this.headerEndRow || !this.footerStartRow) {
         this.error = '请先标记表头结束行和页脚起始行'
         return
-      }
+      }     
+  const config = {
+    headerEndRow: this.headerEndRow,
+    footerStartRow: this.footerStartRow,
+    mapping: this.mapping,
+  }
+  
+  this.$emit('saved', config)
       alert('配置已保存！')
     },
   },
