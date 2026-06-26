@@ -30,10 +30,23 @@
         </nav>
 
         <div class="tab-content">
-          <TemplateUpload v-if="currentTab === 'upload'" @uploaded="onTemplateUploaded" />
-       <TemplateMapping v-if="currentTab === 'mapping'" :template="selectedTemplate" @save="onTemplateSaved" />
-          <ContractExtract v-if="currentTab === 'extract'" />
-          <InvoiceGenerate v-if="currentTab === 'generate'" />
+          <TemplateUpload 
+            v-if="currentTab === 'upload'" 
+            @uploaded="onTemplateUploaded" 
+          />
+          <TemplateMapping 
+            v-if="currentTab === 'mapping'" 
+            :template="templateData"
+            @saved="onMappingSaved"
+          />
+          <ContractExtract 
+            v-if="currentTab === 'extract'"
+            @extracted="onContractExtracted"
+          />
+          <InvoiceGenerate 
+            v-if="currentTab === 'generate'"
+            :extractedData="extractedData"
+          />
           <History v-if="currentTab === 'history'" />
         </div>
       </div>
@@ -63,7 +76,6 @@ export default {
       isLoggedIn: false,
       userName: '',
       currentTab: 'upload',
-      selectedTemplate: null,
       tabs: ['upload', 'mapping', 'extract', 'generate', 'history'],
       tabLabels: {
         upload: '上传模板',
@@ -72,10 +84,13 @@ export default {
         generate: '生成单证',
         history: '历史记录',
       },
+      // 全局数据，贯穿整个流程
+      templateData: null,
+      mappingConfig: null,
+      extractedData: null,
     }
   },
-  methods: 
-  {
+  methods: {
     handleLogin(data) {
       this.isLoggedIn = true
       this.userName = data.phone
@@ -84,11 +99,28 @@ export default {
     logout() {
       this.isLoggedIn = false
       this.userName = ''
+      this.templateData = null
+      this.mappingConfig = null
+      this.extractedData = null
       localStorage.removeItem('user')
     },
+    // Step 1: 上传模板
     onTemplateUploaded(template) {
-      this.selectedTemplate = template
+      console.log('Template uploaded:', template)
+      this.templateData = template
       this.currentTab = 'mapping'
+    },
+    // Step 2: 保存映射配置
+    onMappingSaved(config) {
+      console.log('Mapping saved:', config)
+      this.mappingConfig = config
+      this.currentTab = 'extract'
+    },
+    // Step 3: 识别合同
+    onContractExtracted(data) {
+      console.log('Contract extracted:', data)
+      this.extractedData = data
+      this.currentTab = 'generate'
     },
   },
   mounted() {
@@ -138,7 +170,6 @@ export default {
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.3s;
 }
 
 .user-info button:hover {
@@ -151,13 +182,6 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-}
-
-.login-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
 }
 
 .nav-tabs {
