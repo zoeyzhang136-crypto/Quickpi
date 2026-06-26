@@ -30,12 +30,15 @@
         </nav>
 
         <div class="tab-content">
-       <div v-if="currentTab === 'upload'" style="padding: 40px; text-align: center; color: #999;">
-  <p>模板上传功能调试中...</p>
-</div>
-<div v-if="currentTab === 'mapping'" style="padding: 40px; text-align: center; color: #999;">
-  <p>字段映射功能调试中...</p>
-</div>
+          <TemplateUpload 
+            v-if="currentTab === 'upload'" 
+            @uploaded="onTemplateUploaded" 
+          />
+          <TemplateMapping 
+            v-if="currentTab === 'mapping'" 
+            :templateData="templateData?.data" 
+            @saved="onMappingSaved" 
+          />
           <ContractExtract 
             v-if="currentTab === 'extract'"
             @extracted="onContractExtracted"
@@ -56,10 +59,13 @@ import LoginForm from './components/LoginForm.vue'
 import ContractExtract from './components/ContractExtract.vue'
 import InvoiceGenerate from './components/InvoiceGenerate.vue'
 import History from './components/History.vue'
-
+import TemplateUpload from './components/TemplateUpload.vue'
+import TemplateMapping from './components/TemplateMapping.vue'
 export default {
 components: {
   LoginForm,
+  TemplateUpload,
+  TemplateMapping,
   ContractExtract,
   InvoiceGenerate,
   History,
