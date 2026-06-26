@@ -57,7 +57,6 @@
 <script>
 import LoginForm from './components/LoginForm.vue'
 import TemplateUpload from './components/TemplateUpload.vue'
-const TemplateUpload = { template: '<div>模板上传功能调试中...</div>' }
 import TemplateMapping from './components/TemplateMapping.vue'
 import ContractExtract from './components/ContractExtract.vue'
 import InvoiceGenerate from './components/InvoiceGenerate.vue'
