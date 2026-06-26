@@ -73,8 +73,8 @@
   </div>
 </template>
 
-<script>
 import { templateAPI } from '../api'
+import XLSX from 'xlsx'
 
 export default {
   data() {
@@ -110,29 +110,44 @@ export default {
       this.error = ''
 
       try {
-        const response = await templateAPI.upload(this.selectedFile)
+        // 前端直接用 SheetJS 读取 Excel
+        const arrayBuffer = await this.selectedFile.arrayBuffer()
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' })
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]]
         
-        if (response.data.code === 0) {
-          this.templateData = response.data.data
-        } else {
-          this.error = response.data.message || '上传失败'
+        // 转换为二维数组（保留原始数据，包括合并单元格、格式等）
+        const previewData = XLSX.utils.sheet_to_json(worksheet, { 
+          header: 1,
+          defval: ''  // 空单元格用空字符串表示
+        })
+
+        // 存储模板数据
+        this.templateData = {
+          file_id: 'file_' + Date.now(),
+          file: this.selectedFile,  // 保存原始文件，后续生成时用
+          data: {
+            preview_data: previewData,
+            sheet_name: workbook.SheetNames[0],
+            max_row: previewData.length,
+            max_col: Math.max(...previewData.map(row => row.length))
+          }
         }
       } catch (err) {
-        this.error = err.response?.data?.message || '上传失败，请检查文件格式'
+        this.error = '文件解析失败：' + err.message
       } finally {
         this.uploading = false
         this.loading = false
       }
     },
     confirmUpload() {
-      this.$emit('uploaded', {
-        file: this.selectedFile,
-        data: this.templateData,
-      })
+      if (!this.templateData) {
+        this.error = '请先上传并解析模板'
+        return
+      }
+      this.$emit('uploaded', this.templateData)
     },
   },
 }
-</script>
 
 <style scoped>
 .template-upload {
