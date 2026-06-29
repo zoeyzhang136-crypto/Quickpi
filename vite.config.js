@@ -3,6 +3,14 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
+  optimizeDeps: {
+    include: ['xlsx'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/xlsx/, /node_modules/],
+    },
+  },
   server: {
     proxy: {
       '/api': {
@@ -13,3 +21,4 @@ export default defineConfig({
     },
   },
 })
+
