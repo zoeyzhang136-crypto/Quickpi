@@ -13,6 +13,15 @@
           {{ f }}
           <span v-if="map[f]" class="coord">{{ map[f] }}</span>
         </button>
+        <div class="add-field-row">
+  <input
+    v-model="newField"
+    placeholder="自定义字段..."
+    @keyup.enter="addField"
+    class="field-input"
+  />
+  <button @click="addField" class="btn-add">+</button>
+</div>
         <button @click="save" class="btn-save">保存</button>
       </div>
 
