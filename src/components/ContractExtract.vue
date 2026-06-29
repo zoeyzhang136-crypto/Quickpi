@@ -9,7 +9,7 @@
           <input
             ref="fileInput"
             type="file"
-            accept=".pdf,.xlsx"
+            accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png,.csv,.txt"
             @change="handleFileSelect"
             style="display: none"
           />
@@ -21,7 +21,7 @@
               <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
             <p>拖拽合同文件到这里或点击选择</p>
-            <p class="hint">支持 .pdf 和 .xlsx 格式</p>
+            <p class="hint">支持 PDF、Excel、Word、图片（JPG/PNG）、CSV 等格式</p>
           </div>
 
           <div v-else class="file-preview">
