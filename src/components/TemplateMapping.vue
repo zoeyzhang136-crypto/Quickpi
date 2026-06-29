@@ -46,23 +46,25 @@ export default {
     templateData: Array,
   },
   data() {
-    return {
-      selected: null,
-      fields: ['客户名', '发票号', '日期', '币种'],
-      map: {},
-      error: '',
-    }
+  return {
+    selected: null,
+    fields: [
+      '客户名', '发票号', '日期', '币种',
+      'PO号', '付款方式', '装运港', '目的港',
+      '交货期', '总金额', '备注',
+    ],
+    newField: '',   // 用于用户自定义新增字段
+    map: {},
+    error: '',
+  }
+},
+methods: {
+  addField() {
+    const f = this.newField.trim()
+    if (!f || this.fields.includes(f)) return
+    this.fields.push(f)
+    this.newField = ''
   },
-  methods: {
-    mark(row, col) {
-      if (!this.selected) {
-        this.error = '请先选择字段'
-        return
-      }
-      const col_letter = String.fromCharCode(65 + col)
-      this.map[this.selected] = `${col_letter}${row}`
-      this.error = ''
-    },
     getClass(row, col) {
       const col_letter = String.fromCharCode(65 + col)
       const coord = `${col_letter}${row}`
