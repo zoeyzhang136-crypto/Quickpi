@@ -43,10 +43,11 @@
             v-if="currentTab === 'extract'"
             @extracted="onContractExtracted"
           />
-          <InvoiceGenerate 
-            v-if="currentTab === 'generate'"
-            :extractedData="extractedData"
-          />
+         <InvoiceGenerate 
+  v-if="currentTab === 'generate'"
+  :extractedData="extractedData"
+  :mappingConfig="mappingConfig"
+/>
           <History v-if="currentTab === 'history'" />
         </div>
       </div>
