@@ -51,23 +51,31 @@ export default {
       this.file = e.target.files[0]
       this.error = ''
     },
-    parseFile() {
-      if (!this.file) return
-      this.loading = true
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        try {
-          const wb = XLSX.read(e.target.result, { type: 'binary' })
-          const ws = wb.Sheets[wb.SheetNames[0]]
-          this.data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' })
-          this.loading = false
-        } catch (err) {
-          this.error = '解析失败'
-          this.loading = false
-        }
-      }
-      reader.readAsBinaryString(this.file)
-    },
+   parseFile() {
+  if (!this.file) return
+  this.loading = true
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary' })
+      const ws = wb.Sheets[wb.SheetNames[0]]
+
+      // ✅ 修复：加 blankrows:true 保留空行，raw:false 让日期/数字显示可读
+      this.data = XLSX.utils.sheet_to_json(ws, {
+        header: 1,
+        defval: '',
+        blankrows: true,   // ← 关键！不跳过空行
+        raw: false         // ← 日期/数字转字符串，视觉上更完整
+      })
+
+      this.loading = false
+    } catch (err) {
+      this.error = '解析失败：' + err.message
+      this.loading = false
+    }
+  }
+  reader.readAsBinaryString(this.file)
+},
     confirm() {
       this.$emit('uploaded', { file: this.file, data: this.data })
     },
