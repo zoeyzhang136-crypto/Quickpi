@@ -23,11 +23,11 @@
         <table>
           <tr v-for="(row, i) in data" :key="i">
             <td class="row-idx">{{ i + 1 }}</td>
-            <td v-for="(cell, j) in row" :key="j" class="cell">{{ cell || '-' }}</td>
+            <td v-for="(cell, j) in row" :key="j" class="cell">{{ cell !== '' ? cell : '-' }}</td>
           </tr>
         </table>
       </div>
-      <button @click="confirm" class="btn-confirm">确认</button>
+      <button @click="confirm" class="btn-confirm">确认，进入字段映射 →</button>
     </div>
 
     <div v-if="error" class="error">{{ error }}</div>
@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import XLSX from 'xlsx'
+import * as XLSX from 'xlsx'
 
 export default {
   data() {
@@ -49,33 +49,33 @@ export default {
   methods: {
     selectFile(e) {
       this.file = e.target.files[0]
+      this.data = null
       this.error = ''
     },
-   parseFile() {
-  if (!this.file) return
-  this.loading = true
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    try {
-      const wb = XLSX.read(e.target.result, { type: 'binary' })
-      const ws = wb.Sheets[wb.SheetNames[0]]
-
-      // ✅ 修复：加 blankrows:true 保留空行，raw:false 让日期/数字显示可读
-      this.data = XLSX.utils.sheet_to_json(ws, {
-        header: 1,
-        defval: '',
-        blankrows: true,   // ← 关键！不跳过空行
-        raw: false         // ← 日期/数字转字符串，视觉上更完整
-      })
-
-      this.loading = false
-    } catch (err) {
-      this.error = '解析失败：' + err.message
-      this.loading = false
-    }
-  }
-  reader.readAsBinaryString(this.file)
-},
+    parseFile() {
+      if (!this.file) return
+      this.loading = true
+      this.error = ''
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'binary' })
+          const ws = wb.Sheets[wb.SheetNames[0]]
+  
+          this.data = XLSX.utils.sheet_to_json(ws, {
+            header: 1,
+            defval: '',
+            blankrows: true,
+            raw: false,
+          })
+          this.loading = false
+        } catch (err) {
+          this.error = '解析失败：' + err.message
+          this.loading = false
+        }
+      }
+      reader.readAsBinaryString(this.file)
+    },
     confirm() {
       this.$emit('uploaded', { file: this.file, data: this.data })
     },
