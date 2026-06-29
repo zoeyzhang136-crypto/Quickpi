@@ -14,6 +14,7 @@
           <span v-if="map[f]" class="coord">{{ map[f] }}</span>
         </button>
 
+        <!-- ✅ 新增：自定义字段 -->
         <div class="add-field-row">
           <input
             v-model="newField"
